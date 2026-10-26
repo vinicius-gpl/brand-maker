@@ -1,0 +1,25 @@
+# Site estático do Brand Maker. Atrás de um proxy com HTTPS, deixe a porta 80 mesmo;
+# para o Caddy cuidar do HTTPS sozinho, troque ":80" pelo domínio (ex.: brand.exemplo.com).
+:80 {
+	root * /srv
+	encode zstd gzip
+
+	# Arquivos com hash no nome nunca mudam: cache de um ano.
+	@immutable path /_app/immutable/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	# HTML, sitemap e robots sempre revalidados, para o deploy novo aparecer na hora.
+	@fresh path / /index.html /sitemap.xml /robots.txt
+	header @fresh Cache-Control "public, max-age=0, must-revalidate"
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	try_files {path} {path}.html {path}/index.html
+	file_server
+}

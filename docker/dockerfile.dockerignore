@@ -1,0 +1,10 @@
+# O contexto do build é a raiz do repositório; só o app e o caddyfile entram.
+**
+!brand-maker/
+!docker/caddyfile
+brand-maker/node_modules
+brand-maker/.svelte-kit
+brand-maker/build
+brand-maker/coverage
+brand-maker/test-results
+brand-maker/playwright-report
