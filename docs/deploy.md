@@ -2,22 +2,39 @@
 
 O build é um site estático (`brand-maker/build/`). Duas variáveis controlam o endereço:
 
-| Variável    | Para quê                                                           | Exemplo                                  |
-| ----------- | ------------------------------------------------------------------ | ---------------------------------------- |
-| `BASE_PATH` | Caminho quando o site não está na raiz do domínio                  | `/brand-maker`                           |
-| `SITE_URL`  | Endereço público completo: canonical, metatags, sitemap e robots   | `https://usuario.github.io/brand-maker`  |
+| Variável    | Para quê                                                         | Exemplo                                 |
+| ----------- | ---------------------------------------------------------------- | --------------------------------------- |
+| `BASE_PATH` | Caminho quando o site não está na raiz do domínio                | `/brand-maker`                          |
+| `SITE_URL`  | Endereço público completo: canonical, metatags, sitemap e robots | `https://usuario.github.io/brand-maker` |
 
 ## GitHub Pages (principal)
 
 O workflow `.github/workflows/deploy-pages.yml` roda lint, typecheck, testes com cobertura e e2e,
-e só então publica, a cada push na `main`. Ele já preenche `BASE_PATH` e `SITE_URL` com o nome
-do repositório.
+e só então publica, a cada push na `main`. Publicado em
+**https://brand-maker.vinicius-gpl.com**.
+
+### Domínio próprio
+
+O endereço vem da variável de repositório `CUSTOM_DOMAIN`. Com ela, o build usa `BASE_PATH` vazio
+e `SITE_URL=https://<CUSTOM_DOMAIN>`; sem ela, cai em `https://<usuario>.github.io/<repo>/`.
+
+```bash
+gh variable set CUSTOM_DOMAIN --body brand-maker.vinicius-gpl.com
+gh api -X PUT repos/vinicius-gpl/brand-maker/pages -f cname=brand-maker.vinicius-gpl.com
+```
+
+No DNS (Cloudflare), um registro **CNAME** `brand-maker` → `vinicius-gpl.github.io`, em
+**DNS only** (nuvem cinza) até o GitHub emitir o certificado; depois ligue **Enforce HTTPS**:
+
+```bash
+gh api -X PUT repos/vinicius-gpl/brand-maker/pages -F https_enforced=true
+```
+
+### Repositório novo
 
 1. Suba o repositório (a raiz, com `brand-maker/`, `docker/` e `docs/`).
-2. **Settings → Pages → Source: GitHub Actions**.
-3. Push na `main`. O site fica em `https://<usuario>.github.io/<repositorio>/`.
-
-Com domínio próprio, troque no workflow: `BASE_PATH: ''` e `SITE_URL: https://seu-dominio`.
+2. Ative o Pages pelo Actions: `gh api -X POST repos/<usuario>/<repo>/pages -f build_type=workflow`.
+3. Push na `main`.
 
 ## Docker
 
