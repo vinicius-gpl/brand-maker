@@ -1,0 +1,12 @@
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
+# Miscellaneous
+/static/
+
+# Templates Mustache: o Prettier lê o frontmatter como YAML e quebra o {{campo}}.
+src/lib/kit/templates/
