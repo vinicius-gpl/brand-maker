@@ -1,0 +1,71 @@
+# Publica o brand maker no GitHub Pages a cada push na main.
+# No repositório: Settings → Pages → Source: "GitHub Actions".
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # O app mora em brand-maker/ (a raiz do repositório guarda docker/ e docs/).
+    defaults:
+      run:
+        working-directory: brand-maker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: brand-maker/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check
+      # Unitários, componentes, estado e página (Vitest) e verificador do kit (node --test),
+      # com cobertura mínima de 80% em linhas, funções, ramificações e comandos.
+      - run: npm run test:coverage
+
+      # E2E contra o build de produção. Se falhar, nada é publicado.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: brand-maker/playwright-report
+          retention-days: 7
+
+      # O site de repositório mora em /<nome-do-repo>; com domínio próprio, deixe BASE_PATH vazio
+      # e troque SITE_URL pelo domínio. SITE_URL vai no canonical, metatags, sitemap.xml e robots.txt.
+      - run: npm run build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: brand-maker/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
