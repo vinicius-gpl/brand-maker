@@ -49,12 +49,22 @@ jobs:
           path: brand-maker/playwright-report
           retention-days: 7
 
-      # O site de repositório mora em /<nome-do-repo>; com domínio próprio, deixe BASE_PATH vazio
-      # e troque SITE_URL pelo domínio. SITE_URL vai no canonical, metatags, sitemap.xml e robots.txt.
-      - run: npm run build
+      # Com a variável de repositório CUSTOM_DOMAIN (Settings → Variables), o site fica na raiz do
+      # domínio; sem ela, em <usuario>.github.io/<repo>. SITE_URL vai no canonical, nas metatags,
+      # no sitemap.xml e no robots.txt.
+      - name: Build
         env:
-          BASE_PATH: /${{ github.event.repository.name }}
-          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          if [ -n "$CUSTOM_DOMAIN" ]; then
+            export BASE_PATH="" SITE_URL="https://$CUSTOM_DOMAIN"
+          else
+            export BASE_PATH="/$REPO" SITE_URL="https://$OWNER.github.io/$REPO"
+          fi
+          echo "Publicando em $SITE_URL"
+          npm run build
 
       - uses: actions/upload-pages-artifact@v3
         with:

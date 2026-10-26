@@ -1,5 +1,7 @@
 # Brand Maker
 
+**https://brand-maker.vinicius-gpl.com**
+
 Monte a identidade visual de uma marca na tela e baixe um **kit de design** que prende o agente
 (Claude Code) ao padrão: skills, hooks e scripts `.mjs` que conferem cada arquivo editado, mais
 os tokens em CSS e Tailwind.
@@ -41,9 +43,9 @@ docker compose -f docker/compose.yaml up --build -d   # http://localhost:8080
 
 ## Documentação
 
-| Guia                                      | Para quê                                                    |
-| ----------------------------------------- | ----------------------------------------------------------- |
-| [Como usar](docs/usage.md)                | Montar a marca: identidade, cores, padrão, acabamento, regras |
-| [O kit de design](docs/kit.md)            | O que vem no zip e como instalar num projeto                |
-| [Desenvolvimento](docs/development.md)    | Comandos, estrutura do código, testes e como estender       |
-| [Publicação](docs/deploy.md)              | GitHub Pages, Docker, Cloudflare e SEO (sitemap, metatags)  |
+| Guia                                   | Para quê                                                      |
+| -------------------------------------- | ------------------------------------------------------------- |
+| [Como usar](docs/usage.md)             | Montar a marca: identidade, cores, padrão, acabamento, regras |
+| [O kit de design](docs/kit.md)         | O que vem no zip e como instalar num projeto                  |
+| [Desenvolvimento](docs/development.md) | Comandos, estrutura do código, testes e como estender         |
+| [Publicação](docs/deploy.md)           | GitHub Pages, Docker, Cloudflare e SEO (sitemap, metatags)    |

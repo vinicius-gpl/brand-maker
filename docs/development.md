@@ -48,13 +48,13 @@ brand-maker/src/
 
 ## Testes
 
-| Camada     | Onde                                     | O que cobre                                                         |
-| ---------- | ---------------------------------------- | ------------------------------------------------------------------- |
-| Unitário   | `src/**/*.test.ts`                       | cor, contraste, tokens, harmonias, kit, SEO; todas as paletas × neutros × modos |
-| Estado     | `src/lib/hooks/**/*.svelte.test.ts`      | `DesignState`: escolhas, teclado, salvar e restaurar               |
-| Componente | `src/lib/components/**/*.svelte.test.ts` | cada componente com Testing Library                                 |
-| Página     | `src/routes/page.svelte.test.ts`         | integração da página inteira                                        |
-| Kit        | `src/lib/kit/agent/*.test.mts`           | cada regra (caso feliz e triste) e o verificador em projetos temporários |
+| Camada     | Onde                                     | O que cobre                                                                           |
+| ---------- | ---------------------------------------- | ------------------------------------------------------------------------------------- |
+| Unitário   | `src/**/*.test.ts`                       | cor, contraste, tokens, harmonias, kit, SEO; todas as paletas × neutros × modos       |
+| Estado     | `src/lib/hooks/**/*.svelte.test.ts`      | `DesignState`: escolhas, teclado, salvar e restaurar                                  |
+| Componente | `src/lib/components/**/*.svelte.test.ts` | cada componente com Testing Library                                                   |
+| Página     | `src/routes/page.svelte.test.ts`         | integração da página inteira                                                          |
+| Kit        | `src/lib/kit/agent/*.test.mts`           | cada regra (caso feliz e triste) e o verificador em projetos temporários              |
 | E2E        | `e2e/*.e2e.ts`                           | fluxo completo, tela cheia, bottom sheet, kit baixado rodando, SEO, layout no celular |
 
 Cobertura mínima de **80%** (linhas, funções, ramificações), no Vitest e no Node. Abaixo disso o
