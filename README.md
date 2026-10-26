@@ -1,5 +1,7 @@
 # Brand Maker
 
+![Brand Maker: monte a marca, baixe o kit](docs/banner/banner.jpg)
+
 **https://brand-maker.vinicius-gpl.com**
 
 Monte a identidade visual de uma marca na tela e baixe um **kit de design** que prende o agente
@@ -23,7 +25,7 @@ os tokens em CSS e Tailwind.
 brand-maker/
 ├── brand-maker/   o app (SvelteKit 3 + Svelte 5 + TypeScript + Tailwind v4)
 ├── docker/        imagem com Caddy (dockerfile, caddyfile, compose.yaml)
-├── docs/          documentação e imagens
+├── docs/          documentação, imagens e banner
 └── .github/       workflow que testa e publica no GitHub Pages
 ```
 

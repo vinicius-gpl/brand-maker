@@ -20,6 +20,11 @@ Na barra de baixo, uma escolha por vez:
 - **Acabamento**: um efeito opcional por cima do padrão (vidro, neon, papel…). Não muda forma.
 - **Cor**: paletas por grupo, em carrossel. Setas `←` `→` trocam a paleta e `↑` `↓` trocam o padrão.
 
+Cada padrão muda a prévia inteira. No exemplo abaixo, a marca *Artifact-docs* com cores
+personalizadas no padrão **Carbon**: cantos retos, botões altos e tipografia IBM Plex.
+
+![Prévia com o padrão Carbon e cores personalizadas](images/padrao-carbon.jpg)
+
 O dado faz uma combinação aleatória, e a seta recolhe a barra. No celular, a prévia vem primeiro e a
 barra mostra só o texto das abas.
 
