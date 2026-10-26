@@ -91,3 +91,14 @@ ffmpeg -i print.png -vf "scale=-2:630:flags=lanczos,crop=1200:630:(iw-1200)/2:0"
 # imagens das docs: 1600px de largura
 ffmpeg -i print.png -vf "scale=1600:-2:flags=lanczos" -q:v 4 docs/images/editor.jpg
 ```
+
+O banner do README (1920x1080) é montado em HTML: o print vai numa moldura com o logo e o título.
+Corte as margens vazias do print, renderize com o Chrome e comprima:
+
+```bash
+cd docs/banner
+magick print.png -crop 1320x943+250+0 +repage shot.png   # print de 1832x943
+google-chrome --headless=new --hide-scrollbars --window-size=1920,1080 \
+  --virtual-time-budget=5000 --screenshot=banner.png "file://$PWD/banner.html"
+ffmpeg -i banner.png -q:v 3 banner.jpg && rm shot.png banner.png
+```
