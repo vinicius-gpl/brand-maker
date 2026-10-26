@@ -1,0 +1,11 @@
+// Cloudflare Workers com assets estáticos: `npm run build && npx wrangler deploy`.
+// Não há código de Worker; a Cloudflare serve a pasta build/ direto.
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "brand-maker",
+	"compatibility_date": "2026-10-01",
+	"assets": {
+		"directory": "./build",
+		"not_found_handling": "404-page"
+	}
+}

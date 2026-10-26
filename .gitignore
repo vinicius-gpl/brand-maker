@@ -1,0 +1,6 @@
+# Cada pasta cuida do próprio lixo (o app tem brand-maker/.gitignore).
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example

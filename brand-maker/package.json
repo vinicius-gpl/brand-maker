@@ -1,0 +1,68 @@
+{
+	"name": "brand-maker",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
+		"test:unit": "vitest",
+		"test": "npm run test:unit -- --run && npm run test:kit",
+		"test:kit": "node --test --experimental-test-coverage --test-coverage-include='src/lib/kit/agent/*.mts' --test-coverage-exclude='**/*.test.mts' --test-coverage-lines=80 --test-coverage-branches=80 --test-coverage-functions=80 'src/lib/kit/agent/*.test.mts'",
+		"test:e2e": "playwright test",
+		"test:all": "npm test && npm run test:e2e",
+		"test:coverage": "vitest run --coverage && npm run test:kit"
+	},
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"@playwright/test": "^1.64.1",
+		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/kit": "^3.0.0",
+		"@sveltejs/vite-plugin-svelte": "^7.2.0",
+		"@tailwindcss/vite": "^4.3.0",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/svelte": "^5.4.2",
+		"@testing-library/user-event": "^14.6.8",
+		"@types/mustache": "^4.2.6",
+		"@types/node": "^24",
+		"@vitest/coverage-v8": "^4.1.11",
+		"eslint": "^10.4.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.19.0",
+		"globals": "^17.6.0",
+		"jsdom": "^29.1.1",
+		"prettier": "^3.8.3",
+		"prettier-plugin-svelte": "^4.1.0",
+		"prettier-plugin-tailwindcss": "^0.8.0",
+		"svelte": "^5.57.1",
+		"svelte-check": "^4.6.0",
+		"tailwindcss": "^4.3.0",
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.60.1",
+		"vite": "^8.3.0",
+		"vitest": "^4.1.8"
+	},
+	"imports": {
+		"#lib/*": "./src/lib/*"
+	},
+	"dependencies": {
+		"@lucide/svelte": "^1.61.0",
+		"bits-ui": "^2.20.2",
+		"clsx": "^2.1.1",
+		"fflate": "^0.8.3",
+		"mustache": "^4.2.0",
+		"tailwind-merge": "^3.7.0"
+	},
+	"engines": {
+		"node": ">=22.18"
+	},
+	"overrides": {
+		"@sveltejs/kit": "$@sveltejs/kit"
+	}
+}

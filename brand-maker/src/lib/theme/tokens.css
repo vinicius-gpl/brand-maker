@@ -1,0 +1,160 @@
+/*
+ * Os tokens da própria ferramenta. As cores são escritas no <html> em tempo de execução pelo
+ * `use-design` (a ferramenta se pinta com a paleta escolhida); os valores daqui só valem no
+ * primeiro quadro, para não piscar.
+ *
+ * No Tailwind v4 um token em `@theme` vira classe: `--color-card` dá `bg-card`, `border-card`…
+ * O mapa de cores é o mesmo do `tailwind.css` exportado no kit, para o CSS da prévia
+ * (que vai no kit como referência) funcionar nos dois lugares.
+ */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+	--background: #11111a;
+	--card: #181824;
+	--muted: #1e1e2d;
+	--border: #2b2c3d;
+	--foreground: #f1f5f9;
+	--muted-foreground: #94a3b8;
+	--sidebar: #13131c;
+	--primary: #f2b84b;
+	--primary-foreground: #11111a;
+	--primary-strong: #f2b84b;
+	--primary-soft: #3a3024;
+	--accent-hero: #4fb3a9;
+	--accent-hero-foreground: #11111a;
+	--accent-strong: #4fb3a9;
+	--tertiary: #e07a5f;
+	--tertiary-strong: #e07a5f;
+	--ring: #f2b84b;
+	--shadow: #11111a;
+	--success: #4ade80;
+	--success-soft: #1c3127;
+	--warning: #fbbf24;
+	--warning-soft: #362f1f;
+	--info: #60a5fa;
+	--info-soft: #1e2a40;
+	--destructive: #f87171;
+	--destructive-soft: #382329;
+	--destructive-foreground: #11111a;
+	--chart-1: #f2b84b;
+	--chart-2: #4fb3a9;
+	--chart-3: #e07a5f;
+	--chart-4: #60a5fa;
+	--chart-5: #f87171;
+
+	--brand-font-sans: 'Inter', system-ui, sans-serif;
+	--brand-font-heading: 'Inter', system-ui, sans-serif;
+
+	color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+	color-scheme: light;
+}
+
+/*
+ * A ferramenta fica sempre em Inter: a fonte escolhida para a marca só vale dentro do
+ * preview (`.pv` redefine as duas variáveis), para a interface não quebrar a cada troca.
+ * Fora do `inline`, as utilidades `font-sans`/`font-heading` leem a variável em tempo real.
+ */
+@theme {
+	--font-sans: 'Inter', system-ui, sans-serif;
+	--font-heading: 'Inter', system-ui, sans-serif;
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-card: var(--card);
+	--color-muted: var(--muted);
+	--color-border: var(--border);
+	--color-foreground: var(--foreground);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary-strong: var(--primary-strong);
+	--color-primary-soft: var(--primary-soft);
+	--color-accent-hero: var(--accent-hero);
+	--color-accent-hero-foreground: var(--accent-hero-foreground);
+	--color-accent-strong: var(--accent-strong);
+	--color-tertiary: var(--tertiary);
+	--color-tertiary-strong: var(--tertiary-strong);
+	--color-ring: var(--ring);
+	--color-shadow: var(--shadow);
+	--color-success: var(--success);
+	--color-success-soft: var(--success-soft);
+	--color-warning: var(--warning);
+	--color-warning-soft: var(--warning-soft);
+	--color-info: var(--info);
+	--color-info-soft: var(--info-soft);
+	--color-destructive: var(--destructive);
+	--color-destructive-soft: var(--destructive-soft);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+
+	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+	--radius-control: 0.625rem;
+	--radius-surface: 1rem;
+
+	--animate-shimmer: shimmer 6s linear infinite;
+
+	@keyframes shimmer {
+		to {
+			background-position: 200% center;
+		}
+	}
+}
+
+/* ---------------------------------------------------------------- utilitários próprios */
+
+/** Altura de controle de formulário: 40px, o alvo mínimo da Lei de Fitts. */
+@utility control {
+	height: 2.5rem;
+}
+
+@utility control-sm {
+	height: 2rem;
+}
+
+/**
+ * Barra de rolagem fina, na cor da marca. A cor do polegar vem de `scrollbar-thumb-*`
+ * (qualquer token: `scrollbar-thumb-border`, `hover:scrollbar-thumb-primary`).
+ */
+@utility scrollbar-slim {
+	scrollbar-width: thin;
+	scrollbar-color: var(--scrollbar-thumb, var(--color-border)) var(--scrollbar-track, transparent);
+}
+
+@utility scrollbar-thumb-* {
+	--scrollbar-thumb: --value(--color-*);
+}
+
+@utility scrollbar-track-* {
+	--scrollbar-track: --value(--color-*);
+}
+
+/** Rola sem mostrar a barra (trilhos de chips, onde a borda esmaecida já indica que há mais). */
+@utility scrollbar-none {
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+/** Esmaece as bordas laterais de um trilho rolável: sinal de que tem mais conteúdo. */
+@utility fade-x {
+	mask-image: linear-gradient(
+		to right,
+		transparent,
+		var(--color-background) 1.25rem,
+		var(--color-background) calc(100% - 1.25rem),
+		transparent
+	);
+}

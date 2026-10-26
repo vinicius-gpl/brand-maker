@@ -1,0 +1,40 @@
+@import 'tailwindcss';
+@import '../lib/theme/tokens.css';
+@import '../lib/theme/preview/base.css';
+@import '../lib/theme/preview/patterns.css';
+@import '../lib/theme/preview/styles.css';
+
+@layer base {
+	html {
+		/* Rede de segurança contra scroll horizontal; a causa é tratada nos componentes. */
+		@apply scrollbar-slim scrollbar-thumb-border overflow-x-clip scroll-smooth hover:scrollbar-thumb-muted-foreground;
+	}
+
+	body {
+		@apply bg-background font-sans text-foreground antialiased transition-colors duration-300;
+	}
+
+	:focus-visible {
+		@apply outline-2 outline-offset-2 outline-ring;
+	}
+
+	::selection {
+		@apply bg-primary/35 text-foreground;
+	}
+}
+
+/*
+ * Reduzir movimento vale para tudo, inclusive a prévia. Fica fora de @layer e com !important de
+ * propósito: é preferência de acessibilidade de quem usa, e nenhum estilo pode passar por cima
+ * (dentro de @layer base, o CSS da prévia, que não tem camada, vencia).
+ */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0s !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0s !important;
+		scroll-behavior: auto !important;
+	}
+}

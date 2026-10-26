@@ -1,0 +1,396 @@
+/*
+ * Os acabamentos da prévia: efeitos por cima do padrão (textura, vidro, brilho). Nenhum mexe em
+ * forma, borda de controle ou densidade, que são do padrão (theme/patterns.ts). Cada um abre com
+ * o marcador `@style <id>`: o kit exportado recorta só o trecho escolhido. "Nenhum" não tem trecho.
+ *
+ * Regra da casa: o que o Tailwind expressa vai em @apply; gradiente, máscara e textura (que
+ * não cabem numa classe) ficam em CSS, sempre com as cores de token (`var(--color-*)`).
+ */
+
+/* @style suave — cartões tingidos, sombras difusas e manchas de cor ao fundo. */
+.pv[data-style='suave'] {
+	&::before {
+		content: '';
+		@apply pointer-events-none absolute -inset-1/5;
+		background:
+			radial-gradient(40% 35% at 85% 10%, --alpha(var(--color-primary) / 22%), transparent 70%),
+			radial-gradient(35% 30% at 10% 45%, --alpha(var(--color-accent-hero) / 16%), transparent 70%),
+			radial-gradient(35% 30% at 70% 90%, --alpha(var(--color-tertiary) / 14%), transparent 70%);
+	}
+
+	& .pv-nav {
+		@apply border-b-0 bg-transparent;
+	}
+
+	& .pv-card {
+		--tint: var(--color-primary-soft);
+		@apply border-0 shadow-xl shadow-primary/20;
+		background: color-mix(in srgb, var(--color-card) 70%, var(--tint));
+	}
+
+	& .pv-cards .pv-card:nth-child(2) {
+		--tint: color-mix(in srgb, var(--color-accent-hero) 22%, var(--color-card));
+	}
+
+	& .pv-cards .pv-card:nth-child(3) {
+		--tint: color-mix(in srgb, var(--color-tertiary) 22%, var(--color-card));
+	}
+
+	& .pv-btn {
+		@apply shadow-lg shadow-primary/30;
+	}
+
+	& .pv-btn--ghost {
+		@apply border-transparent bg-muted shadow-none;
+	}
+}
+
+/* @style neon — grade luminosa ao fundo, brilho em botões e títulos, selos com contorno aceso. */
+.pv[data-style='neon'] {
+	--glow: --alpha(var(--color-primary) / 55%);
+	--grid-line: --alpha(var(--color-primary) / 9%);
+
+	&::before {
+		content: '';
+		@apply pointer-events-none absolute inset-0;
+		background-image:
+			linear-gradient(var(--grid-line) 1px, transparent 1px),
+			linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+		background-size: 34px 34px;
+		mask-image: radial-gradient(ellipse at 50% 0%, var(--color-background) 30%, transparent 80%);
+	}
+
+	& .pv-nav {
+		@apply border-primary/35 bg-transparent;
+	}
+
+	& .pv-title mark {
+		text-shadow:
+			0 0 14px var(--glow),
+			0 0 40px var(--glow);
+	}
+
+	& .pv-eyebrow {
+		text-shadow: 0 0 12px --alpha(var(--color-accent-hero) / 60%);
+	}
+
+	& .pv-card {
+		@apply border-primary/40 bg-card/80;
+		box-shadow:
+			0 0 0 1px --alpha(var(--color-primary) / 10%),
+			0 0 28px -8px var(--glow),
+			inset 0 0 22px -14px var(--glow);
+	}
+
+	& .pv-btn--primary {
+		box-shadow:
+			0 0 20px -2px var(--glow),
+			0 0 2px var(--color-primary);
+	}
+
+	& .pv-btn--accent {
+		@apply border-accent-hero bg-transparent text-accent-strong;
+		box-shadow:
+			0 0 16px -4px var(--color-accent-hero),
+			inset 0 0 12px -6px var(--color-accent-hero);
+	}
+
+	& :is(.pv-btn--ghost, .pv-input) {
+		@apply border-primary/40;
+	}
+
+	& .pv-badge {
+		@apply border border-current bg-transparent;
+		box-shadow: 0 0 10px -3px currentColor;
+	}
+
+	& .pv-bars span {
+		box-shadow: 0 0 16px -3px currentColor;
+	}
+}
+
+/* @style textura — grão de papel por cima, fundo pontilhado, contornos tracejados, marca-texto. */
+.pv[data-style='textura'] {
+	--grain: url('../../assets/grain.svg');
+
+	&::after {
+		content: '';
+		@apply pointer-events-none absolute inset-0 z-3 opacity-30 mix-blend-overlay;
+		background-image: var(--grain);
+	}
+
+	& .pv-hero {
+		background-image: radial-gradient(
+			--alpha(var(--color-foreground) / 14%) 1px,
+			transparent 1.3px
+		);
+		background-size: 14px 14px;
+	}
+
+	& .pv-title mark {
+		--ink: --alpha(var(--color-primary) / 35%);
+		@apply text-foreground;
+		background: linear-gradient(transparent 62%, var(--ink) 62% 92%, transparent 92%);
+	}
+
+	& .pv-card {
+		@apply border-[1.5px] border-dashed;
+	}
+
+	& :is(.pv-card, .pv-btn--primary, .pv-btn--accent) {
+		@apply bg-blend-soft-light;
+		background-image: var(--grain);
+	}
+
+	& .pv-bars span {
+		background-image: repeating-linear-gradient(
+			135deg,
+			transparent 0 5px,
+			--alpha(var(--color-background) / 30%) 5px 7px
+		);
+	}
+}
+
+/* @style vidro — cartões translúcidos e desfocados sobre manchas de cor. */
+.pv[data-style='vidro'] {
+	&::before {
+		content: '';
+		@apply pointer-events-none absolute inset-0 opacity-50 blur-3xl;
+		background:
+			radial-gradient(30% 40% at 80% 15%, var(--color-primary), transparent 70%),
+			radial-gradient(28% 35% at 15% 55%, var(--color-accent-hero), transparent 70%),
+			radial-gradient(30% 30% at 60% 95%, var(--color-tertiary), transparent 70%);
+	}
+
+	& .pv-nav {
+		@apply border-foreground/15 bg-card/45 backdrop-blur-lg;
+	}
+
+	& .pv-card {
+		@apply border-foreground/15 bg-card/50 shadow-2xl inset-shadow-xs shadow-background/80 inset-shadow-foreground/15 backdrop-blur-xl;
+	}
+
+	& .pv-btn--ghost {
+		@apply border-foreground/20 bg-card/40 backdrop-blur-md;
+	}
+
+	& .pv-input {
+		@apply bg-background/40;
+	}
+}
+
+/* @style metalico — metal escovado: fios finos ao fundo, brilho especular, aro metálico e título cromado. */
+.pv[data-style='metalico'] {
+	/* O "branco" do brilho é o próprio texto da marca: nunca branco puro. */
+	--sheen: var(--color-foreground);
+	--rim: linear-gradient(
+		135deg,
+		var(--color-primary),
+		color-mix(in srgb, var(--color-primary) 30%, var(--sheen)) 30%,
+		color-mix(in srgb, var(--color-primary) 55%, var(--color-background)) 55%,
+		color-mix(in srgb, var(--color-primary) 40%, var(--sheen)) 80%,
+		var(--color-primary)
+	);
+
+	/* Fios do metal escovado + uma faixa de luz diagonal. */
+	&::before {
+		content: '';
+		@apply pointer-events-none absolute inset-0;
+		background:
+			linear-gradient(115deg, transparent 30%, --alpha(var(--sheen) / 7%) 45%, transparent 60%),
+			repeating-linear-gradient(90deg, --alpha(var(--sheen) / 3%) 0 1px, transparent 1px 3px);
+	}
+
+	& .pv-nav {
+		@apply border-transparent;
+		border-image: var(--rim) 1;
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--color-sidebar) 85%, var(--sheen)),
+			var(--color-sidebar)
+		);
+	}
+
+	& .pv-title mark {
+		@apply animate-shimmer bg-clip-text text-transparent;
+		background-image: linear-gradient(
+			100deg,
+			var(--color-primary-strong) 20%,
+			color-mix(in srgb, var(--color-primary-strong) 35%, var(--sheen)) 40%,
+			var(--color-primary-strong) 55%,
+			var(--color-accent-strong) 80%,
+			var(--color-primary-strong)
+		);
+		background-size: 200% auto;
+	}
+
+	/* Aro metálico: gradiente na borda (border-box) por baixo do fundo do cartão (padding-box). */
+	& .pv-card {
+		@apply border-transparent shadow-lg shadow-background/60;
+		background:
+			linear-gradient(
+					160deg,
+					color-mix(in srgb, var(--color-card) 88%, var(--sheen)),
+					var(--color-card) 45%
+				)
+				padding-box,
+			var(--rim) border-box;
+	}
+
+	& .pv-btn--primary {
+		@apply inset-shadow-xs inset-shadow-foreground/40 text-shadow-background/20 text-shadow-xs;
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--color-primary) 55%, var(--sheen)) 0%,
+			var(--color-primary) 48%,
+			color-mix(in srgb, var(--color-primary) 80%, var(--color-background)) 52%,
+			var(--color-primary) 100%
+		);
+	}
+
+	& .pv-btn--accent {
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--color-accent-hero) 55%, var(--sheen)),
+			var(--color-accent-hero) 50%,
+			color-mix(in srgb, var(--color-accent-hero) 80%, var(--color-background))
+		);
+	}
+
+	& .pv-badge {
+		@apply border border-current/40 inset-shadow-xs inset-shadow-foreground/20;
+	}
+
+	& .pv-bars span {
+		background-image: linear-gradient(
+			90deg,
+			--alpha(var(--color-background) / 25%),
+			--alpha(var(--sheen) / 30%) 35%,
+			transparent 60%,
+			--alpha(var(--color-background) / 25%)
+		);
+	}
+}
+
+/* @style holografico — iridescência: manchas que mudam de cor, aro arco-íris e título furta-cor. */
+.pv[data-style='holografico'] {
+	--iris: conic-gradient(
+		from 210deg,
+		var(--color-primary),
+		var(--color-accent-hero),
+		var(--color-tertiary),
+		var(--color-primary)
+	);
+
+	&::before {
+		content: '';
+		@apply pointer-events-none absolute -inset-1/4 opacity-25 blur-3xl;
+		background: var(--iris);
+	}
+
+	& .pv-nav {
+		@apply border-foreground/10 bg-card/40 backdrop-blur-md;
+	}
+
+	& .pv-title mark {
+		@apply animate-shimmer bg-clip-text text-transparent;
+		background-image: linear-gradient(
+			90deg,
+			var(--color-primary-strong),
+			var(--color-accent-strong),
+			var(--color-tertiary-strong),
+			var(--color-primary-strong)
+		);
+		background-size: 200% auto;
+	}
+
+	& .pv-card {
+		@apply border-2 border-transparent shadow-xl shadow-accent-hero/15;
+		background:
+			linear-gradient(var(--color-card), var(--color-card)) padding-box,
+			var(--iris) border-box;
+	}
+
+	& .pv-btn--primary {
+		background: linear-gradient(
+			110deg,
+			var(--color-primary),
+			var(--color-accent-hero) 55%,
+			var(--color-tertiary)
+		);
+	}
+
+	& .pv-btn--accent {
+		@apply border-2 border-transparent text-foreground;
+		background:
+			linear-gradient(var(--color-background), var(--color-background)) padding-box,
+			var(--iris) border-box;
+	}
+
+	& .pv-badge {
+		@apply border border-current/30;
+	}
+
+	& .pv-bars span {
+		background-image: linear-gradient(
+			180deg,
+			--alpha(var(--color-accent-hero) / 45%),
+			transparent 70%
+		);
+	}
+}
+
+/* @style papel — fibras de papel, pauta de caderno no topo, sombra de folha e sublinhado ondulado. */
+.pv[data-style='papel'] {
+	--fibers: url('../../assets/paper.svg');
+
+	&::after {
+		content: '';
+		@apply pointer-events-none absolute inset-0 z-3 opacity-25 mix-blend-soft-light;
+		background-image: var(--fibers);
+	}
+
+	/* Pauta: linhas horizontais e a margem vermelha do caderno, na cor de destaque. */
+	& .pv-hero {
+		background:
+			linear-gradient(
+				90deg,
+				transparent 2.75rem,
+				--alpha(var(--color-tertiary) / 45%) 2.75rem 2.85rem,
+				transparent 2.85rem
+			),
+			repeating-linear-gradient(
+				180deg,
+				transparent 0 1.95rem,
+				--alpha(var(--color-foreground) / 8%) 1.95rem 2rem
+			);
+	}
+
+	& .pv-title {
+		@apply font-heading;
+	}
+
+	& .pv-title mark {
+		@apply underline decoration-tertiary-strong decoration-wavy decoration-2 underline-offset-8;
+	}
+
+	& .pv-card {
+		@apply border-border/60;
+		box-shadow:
+			0 1px 0 var(--color-border),
+			0 10px 18px -12px --alpha(var(--color-background) / 70%);
+		rotate: -0.4deg;
+	}
+
+	& .pv-cards .pv-card:nth-child(even) {
+		rotate: 0.5deg;
+	}
+
+	& .pv-btn--primary {
+		@apply shadow-md shadow-primary/25;
+	}
+
+	& .pv-tags li {
+		@apply bg-transparent ring-1 ring-border;
+	}
+}
