@@ -24,9 +24,10 @@ os tokens em CSS e Tailwind.
 ```
 brand-maker/
 ├── brand-maker/   o app (SvelteKit 3 + Svelte 5 + TypeScript + Tailwind v4)
-├── docker/        imagem com Caddy (dockerfile, caddyfile, compose.yaml)
+│   └── .config/docker/   imagem com Caddy (dockerfile, caddyfile, compose.yml)
+├── .komodo/       deploy no hetzner pelo Komodo
 ├── docs/          documentação, imagens e banner
-└── .github/       workflow que testa e publica no GitHub Pages
+└── .github/       workflow de testes
 ```
 
 ## Começar
@@ -40,7 +41,7 @@ npm run dev        # http://localhost:5173
 Ou com Docker, da raiz do repositório:
 
 ```bash
-docker compose -f docker/compose.yaml up --build -d   # http://localhost:8080
+docker compose -f brand-maker/.config/docker/compose.yml up --build -d   # http://localhost:8080
 ```
 
 ## Documentação
@@ -50,4 +51,4 @@ docker compose -f docker/compose.yaml up --build -d   # http://localhost:8080
 | [Como usar](docs/usage.md)             | Montar a marca: identidade, cores, padrão, acabamento, regras |
 | [O kit de design](docs/kit.md)         | O que vem no zip e como instalar num projeto                  |
 | [Desenvolvimento](docs/development.md) | Comandos, estrutura do código, testes e como estender         |
-| [Publicação](docs/deploy.md)           | GitHub Pages, Docker, Cloudflare e SEO (sitemap, metatags)    |
+| [Publicação](docs/deploy.md)           | Komodo (hetzner), Docker, Cloudflare e SEO (sitemap, metatags) |
