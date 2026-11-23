@@ -1,6 +1,6 @@
-# Site estático do Brand Maker. Atrás de um proxy com HTTPS, deixe a porta 80 mesmo;
-# para o Caddy cuidar do HTTPS sozinho, troque ":80" pelo domínio (ex.: brand.exemplo.com).
-:80 {
+# Site estático do Brand Maker, na porta 3000 (padrão dos projetos). O HTTPS fica com o Caddy do
+# servidor, na frente; para este Caddy cuidar do HTTPS sozinho, troque ":3000" pelo domínio.
+:3000 {
 	root * /srv
 	encode zstd gzip
 
