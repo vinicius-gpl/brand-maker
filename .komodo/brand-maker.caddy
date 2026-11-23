@@ -1,0 +1,14 @@
+brand-maker.vinicius-gpl.com {
+    header {
+        Strict-Transport-Security "max-age=31536000;"
+    }
+
+    # Swarm service of the hetzner_brand-maker stack, over the edge network. The app's own Caddy
+    # (brand-maker/.config/docker/caddyfile) sets the cache and security headers.
+    reverse_proxy hetzner_brand-maker_web:3000
+
+    log {
+        output file /data/brand-maker-access.log
+        format json
+    }
+}
