@@ -7,53 +7,55 @@ O build é um site estático (`brand-maker/build/`). Duas variáveis controlam o
 | `BASE_PATH` | Caminho quando o site não está na raiz do domínio                | `/brand-maker`                          |
 | `SITE_URL`  | Endereço público completo: canonical, metatags, sitemap e robots | `https://usuario.github.io/brand-maker` |
 
-## GitHub Pages (principal)
+## Komodo, no hetzner (principal)
 
-O workflow `.github/workflows/deploy-pages.yml` roda lint, typecheck, testes com cobertura e e2e,
-e só então publica, a cada push na `main`. Publicado em
-**https://brand-maker.vinicius-gpl.com**.
+Publicado em **https://brand-maker.vinicius-gpl.com**, no servidor hetzner do
+[config](https://github.com/vinicius-gpl/config), atrás do Caddy de lá. Tudo do deploy está em
+[`.komodo/`](../.komodo/). A cada push na `main`, o webhook do GitHub dispara a Procedure
+`hetzner_brand-maker` do Komodo:
 
-### Domínio próprio
+1. **Pull**: o Repo `hetzner_brand-maker` atualiza o clone da `main` no hetzner.
+2. **Build**: o Build `hetzner_brand-maker` constrói o `brand-maker/.config/docker/dockerfile` no
+   próprio hetzner, com `BASE_PATH` vazio e `SITE_URL=https://brand-maker.vinicius-gpl.com`. Sem
+   registry: a imagem fica só no hetzner, como `brand-maker:<commit curto>-hetzner`.
+3. **Deploy**: a Stack `hetzner_brand-maker` sobe o `.komodo/brand-maker.compose.yml` no Swarm, e o
+   `route.sh` grava o `brand-maker.caddy` no Caddy do servidor.
 
-O endereço vem da variável de repositório `CUSTOM_DOMAIN`. Com ela, o build usa `BASE_PATH` vazio
-e `SITE_URL=https://<CUSTOM_DOMAIN>`; sem ela, cai em `https://<usuario>.github.io/<repo>/`.
+Para voltar à versão anterior: Action `hetzner_brand-maker_rollback`. Os testes (lint, tipos,
+cobertura e e2e) rodam no `.github/workflows/brand-maker-tests.yml`, em todo PR e push.
 
-```bash
-gh variable set CUSTOM_DOMAIN --body brand-maker.vinicius-gpl.com
-gh api -X PUT repos/vinicius-gpl/brand-maker/pages -f cname=brand-maker.vinicius-gpl.com
-```
+### Antes do primeiro deploy
 
-No DNS (Cloudflare), um registro **CNAME** `brand-maker` → `vinicius-gpl.github.io`, em
-**DNS only** (nuvem cinza) até o GitHub emitir o certificado; depois ligue **Enforce HTTPS**:
+- DNS (Cloudflare): `brand-maker` vira registro **A** para o IP do hetzner, em modo "DNS only", no
+  lugar do CNAME do GitHub Pages. Depois, desligue o Pages do repositório.
+- No Komodo: crie a Sync `brand-maker` (repo `vinicius-gpl/brand-maker`, branch `main`, arquivo
+  `.komodo/komodo.toml`), execute e cadastre os dois webhooks (*Settings → Webhooks*, JSON, evento
+  *push*, com o segredo dos webhooks do Komodo):
 
-```bash
-gh api -X PUT repos/vinicius-gpl/brand-maker/pages -F https_enforced=true
-```
-
-### Repositório novo
-
-1. Suba o repositório (a raiz, com `brand-maker/`, `docker/` e `docs/`).
-2. Ative o Pages pelo Actions: `gh api -X POST repos/<usuario>/<repo>/pages -f build_type=workflow`.
-3. Push na `main`.
+| Webhook | URL |
+|---|---|
+| Sync (aplica o `.komodo/komodo.toml`) | `https://komodo.vinicius-gpl.com/listener/github/sync/<id da sync brand-maker>/sync` |
+| Procedure (publica o app) | `https://komodo.vinicius-gpl.com/listener/github/procedure/hetzner_brand-maker/main` |
 
 ## Docker
 
-A imagem compila o app com Node e entrega com Caddy (a imagem final não leva Node). Arquivos em
-`docker/`: `dockerfile`, `caddyfile`, `compose.yaml` e `dockerfile.dockerignore`.
+A imagem compila o app com Node e entrega com Caddy (a imagem final não leva Node), na porta 3000
+como em todos os projetos. Arquivos em `brand-maker/.config/docker/`: `dockerfile`, `caddyfile` e
+`compose.yml`; o contexto do build é a pasta `brand-maker/` (com o `.dockerignore` dela).
 
 ```bash
 # da raiz do repositório
-docker compose -f docker/compose.yaml up --build -d          # http://localhost:8080
-SITE_URL=https://brand.exemplo.com docker compose -f docker/compose.yaml up --build -d
+docker compose -f brand-maker/.config/docker/compose.yml up --build -d          # http://localhost:8080
+SITE_URL=https://brand.exemplo.com docker compose -f brand-maker/.config/docker/compose.yml up --build -d
 
 # sem compose
-docker build -f docker/dockerfile --build-arg SITE_URL=https://brand.exemplo.com -t brand-maker .
-docker run -d -p 8080:80 brand-maker
+docker build -f brand-maker/.config/docker/dockerfile --build-arg SITE_URL=https://brand.exemplo.com -t brand-maker brand-maker
+docker run -d -p 8080:3000 brand-maker
 ```
 
 O Caddy comprime (zstd/gzip), dá cache de um ano aos arquivos com hash (`/_app/immutable/`),
 revalida HTML, sitemap e robots a cada visita e manda cabeçalhos de segurança. Para o Caddy cuidar
-do HTTPS sozinho, troque `:80` pelo domínio no `caddyfile`.
+do HTTPS sozinho, troque `:3000` pelo domínio no `caddyfile`.
 
 ## Cloudflare Workers (alternativa)
 
@@ -76,9 +78,8 @@ SITE_URL=https://brand-maker.<conta>.workers.dev npm run build && npx wrangler d
   que o Google ignora.
 - **robots.txt**: libera tudo e aponta o sitemap com URL absoluta.
 
-No GitHub Pages de repositório, buscadores só leem o `robots.txt` da raiz do domínio
-(`usuario.github.io/robots.txt`). Então envie o sitemap direto no
-[Google Search Console](https://search.google.com/search-console): `https://<usuario>.github.io/<repo>/sitemap.xml`.
+Envie o sitemap no [Google Search Console](https://search.google.com/search-console):
+`https://brand-maker.vinicius-gpl.com/sitemap.xml`.
 
 ### Gerar a imagem de novo
 

@@ -1,0 +1,14 @@
+# Sobe o Brand Maker em http://localhost:8080, com a mesma imagem de produção.
+#   docker compose -f brand-maker/.config/docker/compose.yml up --build -d
+services:
+  brand-maker:
+    build:
+      context: ../..
+      dockerfile: .config/docker/dockerfile
+      args:
+        BASE_PATH: ''
+        SITE_URL: ${SITE_URL:-http://localhost:8080}
+    image: brand-maker:latest
+    ports:
+      - '8080:3000'
+    restart: unless-stopped

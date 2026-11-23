@@ -1,0 +1,124 @@
+# Komodo deploy of the Brand Maker (brand-maker/) on the hetzner server.
+# Names follow <server>_<app>; Swarm completes the services with _<service> (hetzner_brand-maker_web).
+#
+#   Sync       applies this file (GitHub webhook on push to main).
+#   Repo       clone of main on the hetzner server; Build and Stack read from it.
+#   Build      brand-maker/.config/docker/dockerfile built ON the hetzner server itself.
+#              No registry: the image stays local as brand-maker:<short commit>-hetzner.
+#   Stack      .komodo/brand-maker.compose.yml on the hetzner Swarm; komodo.sh runs the deploy steps
+#              and route.sh publishes brand-maker.caddy (brand-maker.vinicius-gpl.com) on the server's Caddy.
+#   Procedure  Pull -> Build -> Deploy, triggered by the GitHub webhook
+#              (/listener/github/procedure/hetzner_brand-maker/main).
+#   Action     native Swarm rollback to the previous version.
+#
+# A static site: no secrets, so no Komodo Variables.
+
+[[resource_sync]]
+name = "brand-maker"
+description = "Aplica o deploy do Brand Maker (.komodo/komodo.toml)"
+tags = ["env:hetzner", "app:brand-maker"]
+[resource_sync.config]
+git_provider = "github.com"
+repo = "vinicius-gpl/brand-maker"
+branch = "main"
+resource_path = [".komodo/komodo.toml"]
+delete = false
+
+[[repo]]
+name = "hetzner_brand-maker"
+description = "Clone da main do brand-maker no hetzner"
+tags = ["env:hetzner", "app:brand-maker"]
+[repo.config]
+server = "hetzner"
+git_provider = "github.com"
+repo = "vinicius-gpl/brand-maker"
+branch = "main"
+webhook_enabled = false
+links = ["https://github.com/vinicius-gpl/brand-maker/tree/main/brand-maker"]
+
+[[build]]
+name = "hetzner_brand-maker"
+description = "Imagem do Brand Maker, construída no próprio hetzner (sem registry)"
+tags = ["env:hetzner", "app:brand-maker"]
+[build.config]
+builder = "hetzner"
+linked_repo = "hetzner_brand-maker"
+webhook_enabled = false
+build_path = "brand-maker"
+dockerfile_path = ".config/docker/dockerfile"
+image_name = "brand-maker"
+image_tag = "hetzner"
+include_latest_tag = false
+include_version_tags = false
+include_commit_tag = true
+build_args = """
+BASE_PATH=
+SITE_URL=https://brand-maker.vinicius-gpl.com
+"""
+labels = """
+org.opencontainers.image.source=https://github.com/vinicius-gpl/brand-maker
+app=brand-maker
+server=hetzner
+"""
+links = ["https://brand-maker.vinicius-gpl.com"]
+
+[[stack]]
+name = "hetzner_brand-maker"
+description = "Brand Maker no Swarm do hetzner"
+tags = ["env:hetzner", "app:brand-maker"]
+[stack.config]
+swarm = "hetzner"
+project_name = "hetzner_brand-maker"
+linked_repo = "hetzner_brand-maker"
+webhook_enabled = false
+run_directory = ".komodo"
+file_paths = ["brand-maker.compose.yml"]
+extra_args = ["--resolve-image", "never", "--detach=false"]
+links = ["https://brand-maker.vinicius-gpl.com"]
+pre_deploy.command = "sh komodo.sh pre-deploy brand-maker hetzner"
+compose_cmd_wrapper_include = ["config", "deploy"]
+compose_cmd_wrapper = "sh komodo.sh deploy brand-maker hetzner [[COMPOSE_COMMAND]]"
+post_deploy.command = "sh komodo.sh post-deploy brand-maker hetzner"
+
+[[procedure]]
+name = "hetzner_brand-maker"
+description = "Publica a main do Brand Maker no hetzner: Pull, Build e Deploy"
+tags = ["env:hetzner", "app:brand-maker"]
+[procedure.config]
+webhook_enabled = true
+
+[[procedure.config.stage]]
+name = "Pull"
+executions = [
+  { execution.type = "PullRepo", execution.params.repo = "hetzner_brand-maker" },
+]
+
+[[procedure.config.stage]]
+name = "Build"
+executions = [
+  { execution.type = "RunBuild", execution.params.build = "hetzner_brand-maker" },
+]
+
+[[procedure.config.stage]]
+name = "Deploy"
+executions = [
+  { execution.type = "DeployStack", execution.params.stack = "hetzner_brand-maker" },
+]
+
+[[action]]
+name = "hetzner_brand-maker_rollback"
+description = "Volta o Brand Maker para a versão anterior (rollback do Swarm)"
+tags = ["env:hetzner", "app:brand-maker"]
+[action.config]
+webhook_enabled = false
+file_contents = '''
+const stack = 'hetzner_brand-maker';
+await komodo.execute_server_terminal(
+  {
+    server: 'hetzner',
+    command: `docker service ls -q --filter label=com.docker.stack.namespace=${stack} | xargs -r -n1 docker service rollback --detach=false`,
+    init: { command: 'sh' },
+  },
+  { onLine: (line) => console.log(line), onFinish: (code) => console.log(`exit ${code}`) },
+);
+'''

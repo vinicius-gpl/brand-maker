@@ -1,0 +1,10 @@
+# Fora do contexto do build (a pasta brand-maker/): dependências e saídas locais, que o dockerfile
+# instala e gera de novo.
+node_modules
+.svelte-kit
+build
+coverage
+test-results
+playwright-report
+.env
+.env.*
